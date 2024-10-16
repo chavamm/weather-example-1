@@ -18,16 +18,23 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("{daysToForecast:int}", Name = "GetWeatherForecast")]
+        public async Task<ActionResult<IEnumerable<WeatherForecast>>> Get(int daysToForecast)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            if (daysToForecast <= 0)
+            {
+                return BadRequest("El parametro `daysToForecast` debe de ser un entero mayor a cero.");
+            }
+
+            var result = Enumerable.Range(1, daysToForecast).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+
+            return Ok(result);
         }
     }
 }
